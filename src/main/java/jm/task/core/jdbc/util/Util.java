@@ -14,7 +14,7 @@ public class Util {
                     "jdbc:mysql://localhost:3306/users_database", "minin", "root1234!");
 
             if (!con.isClosed()) {
-                System.out.println("Connection successful");
+                System.out.println("\nConnection successful");
             }
         } catch (SQLException e) {
             System.out.println("Exception while trying to connect database");

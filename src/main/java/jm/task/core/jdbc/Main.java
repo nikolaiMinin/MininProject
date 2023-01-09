@@ -11,27 +11,22 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
-        try (Connection con = Util.getConnection()) {
-            UserServiceImpl userService = new UserServiceImpl();
+        UserServiceImpl userService = new UserServiceImpl();
 
-            userService.dropUsersTable();
-            userService.createUsersTable();
+        userService.dropUsersTable();
+        userService.createUsersTable();
 
-            userService.saveUser("Nick","Perumov",(byte)59);
-            userService.saveUser("Boris","Strugatskiy",(byte)79);
-            userService.saveUser("Kir", "Bulychev",(byte)78);
-            userService.saveUser("Sergey","Lukyanenko",(byte)54);
+        userService.saveUser("Nick","Perumov",(byte)59);
+        userService.saveUser("Boris","Strugatskiy",(byte)79);
+        userService.saveUser("Kir", "Bulychev",(byte)78);
+        userService.saveUser("Sergey","Lukyanenko",(byte)54);
 
-            List<User> userList = userService.getAllUsers();
-            for (User user : userList) {
-                System.out.println(user.toString());
-            }
-
-            userService.cleanUsersTable();
-            userService.dropUsersTable();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        List<User> userList = userService.getAllUsers();
+        for (User user : userList) {
+            System.out.println(user.toString());
         }
+
+        userService.cleanUsersTable();
+        userService.dropUsersTable();
     }
 }

@@ -17,23 +17,25 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void createUsersTable() {
 
-        try (Connection con = Util.getConnection();Statement stmt = con.createStatement()) {
-            stmt.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS `users_database`.`users_table` (
-                    `user_id` BIGINT(3) NOT NULL AUTO_INCREMENT,
-                    `user_name` VARCHAR(45) NOT NULL,
-                    `user_lastname` VARCHAR(45) NOT NULL,
-                    `user_age` SMALLINT(3) NOT NULL,
-                    
-                    PRIMARY KEY (`user_id`))
-                    """);
+        String sql = """
+                CREATE TABLE IF NOT EXISTS `users_database`.`users_table` (
+                `user_id` BIGINT(3) NOT NULL AUTO_INCREMENT,
+                `user_name` VARCHAR(45) NOT NULL,
+                `user_lastname` VARCHAR(45) NOT NULL,
+                `user_age` SMALLINT(3) NOT NULL,                    
+                PRIMARY KEY (`user_id`))
+                """;
+
+        try (Connection con = Util.getConnection(); PreparedStatement prst = con.prepareStatement(sql)) {
+            prst.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     public void dropUsersTable() {
-        try (Connection con = Util.getConnection(); Statement stmt = con.createStatement()) {
-            stmt.executeUpdate("DROP TABLE IF EXISTS `users_database`.`users_table`");
+        String sql = "DROP TABLE IF EXISTS `users_database`.`users_table`";
+        try (Connection con = Util.getConnection(); PreparedStatement prst = con.prepareStatement(sql)) {
+            prst.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -41,14 +43,14 @@ public class UserDaoJDBCImpl implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
 
         try (Connection con = Util.getConnection();
-             PreparedStatement stmt
+             PreparedStatement prst
                      = con.prepareStatement("INSERT INTO users_table(user_name, user_lastname, user_age) " +
                      "VALUES (?, ?, ?)")) {
 
-            stmt.setString(1, name);
-            stmt.setString(2, lastName);
-            stmt.setInt(3, age);
-            stmt.executeUpdate();
+            prst.setString(1, name);
+            prst.setString(2, lastName);
+            prst.setInt(3, age);
+            prst.executeUpdate();
 
             System.out.printf("User с именем – %s добавлен в базу данных",name);
 
@@ -57,8 +59,11 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
     public void removeUserById(long id) {
-        try (Connection con = Util.getConnection(); Statement stmt = con.createStatement()) {
-            stmt.executeUpdate("DELETE FROM `users_database`.`users_table` WHERE (`user_id` = " + id + " )");
+
+        try (Connection con = Util.getConnection();
+             PreparedStatement prst = con.prepareStatement("DELETE FROM `users_database`.`users_table` WHERE (`user_id` = ?)")) {
+            prst.setLong(1, id);
+            prst.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -68,8 +73,8 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> userList = new ArrayList<>();
 
         try (Connection con = Util.getConnection();
-            PreparedStatement stmt = con.prepareStatement("SELECT * FROM users_table")) {
-            ResultSet rs = stmt.executeQuery();
+            PreparedStatement prst = con.prepareStatement("SELECT * FROM users_table")) {
+            ResultSet rs = prst.executeQuery();
 
             while (rs.next()) {
                 Long user_id = rs.getLong("user_id");
@@ -85,8 +90,10 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        try (Connection con = Util.getConnection(); Statement stmt = con.createStatement()) {
-            stmt.executeUpdate("DELETE FROM `users_database`.`users_table`");
+        String sql = "DELETE FROM `users_database`.`users_table`";
+        try (Connection con = Util.getConnection();
+             PreparedStatement prst = con.prepareStatement(sql)) {
+            prst.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
